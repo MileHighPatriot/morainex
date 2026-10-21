@@ -483,10 +483,10 @@ main { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
 .hotspot:has(input:checked) { background: var(--porcelain); border-color: var(--porcelain); }
 .hot-panel { margin: 0 0 10px; }
 .can-motion .hot-panel { display: none; }
-.can-motion .smart-grid:has(#hot-lighting:checked) .hot-lighting,
-.can-motion .smart-grid:has(#hot-switches:checked) .hot-switches,
-.can-motion .smart-grid:has(#hot-sensors:checked) .hot-sensors,
-.can-motion .smart-grid:has(#hot-panel:checked) .hot-panel { display: block; }
+.can-motion .smart-grid:has(#hot-lighting:checked) .hot-item-lighting,
+.can-motion .smart-grid:has(#hot-switches:checked) .hot-item-switches,
+.can-motion .smart-grid:has(#hot-sensors:checked) .hot-item-sensors,
+.can-motion .smart-grid:has(#hot-panel:checked) .hot-item-panel { display: block; }
 .can-motion .hotspot { animation: pulse 2.6s ease infinite; }
 @keyframes pulse {
   0%, 100% { box-shadow: 0 0 0 0 rgba(169, 205, 238, 0.55); }

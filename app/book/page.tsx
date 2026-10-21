@@ -1,3 +1,4 @@
+import { pageMeta } from "@/lib/meta";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { FaqList, Financing } from "@/components/blocks";
@@ -5,7 +6,7 @@ import { BookForm } from "@/components/book-form";
 import { Photo } from "@/components/media";
 import { financeFaqs, upcomingDays } from "@/lib/site";
 
-export const metadata: Metadata = { title: "Book a visit" };
+export const metadata: Metadata = pageMeta("/book/", "Book a visit", "Pick a day and time for an electrician visit in the Denver metro. Demo booking only.");
 
 export default function BookPage() {
   const days = upcomingDays();
@@ -14,7 +15,6 @@ export default function BookPage() {
       <section className="section">
         <div className="wrap booking-grid">
           <div>
-            <p className="section-key">S1</p>
             <h1>Pick a time</h1>
             <BookForm days={days} />
           </div>
@@ -26,7 +26,6 @@ export default function BookPage() {
       </section>
       <section className="section dark" id="s2">
         <div className="wrap">
-          <p className="section-key">S2</p>
           <h2>What to expect</h2>
           <ul className="plain-list">
             <li>You get an arrival window, not an all-day wait.</li>
@@ -39,7 +38,6 @@ export default function BookPage() {
         <div className="wrap split-2">
           <Financing />
           <article className="card plan" id="s4">
-            <p className="section-key">S4</p>
             <h2>Morainex Care (concept)</h2>
             <p>One electrical safety check a year, plus a few perks when you need us.</p>
             <p className="price">$[X]/yr (sample)</p>
@@ -52,7 +50,6 @@ export default function BookPage() {
       </section>
       <section className="section" id="s5">
         <div className="wrap narrow">
-          <p className="section-key">S5</p>
           <h2>Financing questions</h2>
           <FaqList items={financeFaqs} />
         </div>

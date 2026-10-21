@@ -12,7 +12,7 @@ export function Photo({ name, alt, priority = false, sizes, className }: PhotoPr
   const src = (width: number) => asset(`/images/${name}-${width}.webp`);
   const hero = name === "hero";
   const srcSet = hero
-    ? `${src(1200)} 1200w, ${src(1600)} 1600w, ${src(2048)} 2048w`
+    ? `${src(800)} 800w, ${src(1200)} 1200w, ${src(1600)} 1600w, ${src(2048)} 2048w`
     : `${src(160)} 160w, ${src(240)} 240w, ${src(1200)} 1200w`;
   return (
     // eslint-disable-next-line @next/next/no-img-element

@@ -1,6 +1,9 @@
+import { pageMeta } from "@/lib/meta";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { CareTeaser, EmergencyChecklist, Financing, FaqList } from "@/components/blocks";
 import { ServiceFinder } from "@/components/finder";
+import { StatsBand } from "@/components/stats";
 import { Hero } from "@/components/hero";
 import { EstimateTeaser, Gallery, JobTracker, ServiceArea, SmartHome } from "@/components/home-islands";
 import { Photo } from "@/components/media";
@@ -13,11 +16,12 @@ export default function HomePage() {
         rel="preload"
         as="image"
         href={asset("/images/hero-1200.webp")}
-        imageSrcSet={`${asset("/images/hero-1200.webp")} 1200w, ${asset("/images/hero-1600.webp")} 1600w, ${asset("/images/hero-2048.webp")} 2048w`}
+        imageSrcSet={`${asset("/images/hero-800.webp")} 800w, ${asset("/images/hero-1200.webp")} 1200w, ${asset("/images/hero-1600.webp")} 1600w, ${asset("/images/hero-2048.webp")} 2048w`}
         imageSizes="100vw"
         fetchPriority="high"
       />
       <Hero />
+      <StatsBand />
       <ServiceFinder />
       <section className="section dark">
         <div className="wrap">
@@ -26,7 +30,6 @@ export default function HomePage() {
       </section>
       <section className="section" id="s4" aria-label="Proof">
         <div className="wrap">
-          <p className="section-key">S4</p>
           <ul className="proof">
             <li>2-year workmanship warranty (example)</li>
             <li>Arrival window given when you book (example)</li>
@@ -36,14 +39,12 @@ export default function HomePage() {
       </section>
       <section className="section dark" id="s5">
         <div className="wrap">
-          <p className="section-key">S5</p>
           <h2>See a price range before anyone comes out.</h2>
           <EstimateTeaser />
         </div>
       </section>
       <section className="section" id="ev">
         <div className="wrap">
-          <p className="section-key">S6</p>
           <div className="ev-grid">
             <div>
               <h2>EV charging at home</h2>
@@ -88,7 +89,6 @@ export default function HomePage() {
       </section>
       <section className="section dark" id="s7">
         <div className="wrap">
-          <p className="section-key">S7</p>
           <h2>Smart home</h2>
           <SmartHome />
           <Photo
@@ -101,7 +101,6 @@ export default function HomePage() {
       <section className="section" id="s8">
         <div className="wrap solar-grid">
           <div>
-            <p className="section-key">S8</p>
             <h2>Get your house ready for solar</h2>
             <ul className="plain-list solar-list">
               <li>Panel prep, so your service can take solar later without a second upgrade</li>
@@ -117,7 +116,6 @@ export default function HomePage() {
       </section>
       <section className="section dark" id="s9" aria-label="Process">
         <div className="wrap">
-          <p className="section-key">S9</p>
           <ol className="process">
             <li>
               <h3>Call</h3>
@@ -143,7 +141,6 @@ export default function HomePage() {
       </section>
       <section className="section" id="s10">
         <div className="wrap">
-          <p className="section-key">S10</p>
           <h2>Know where your job is.</h2>
           <p>Every job gets a tracker you can check from your phone.</p>
           <JobTracker />
@@ -152,14 +149,12 @@ export default function HomePage() {
       </section>
       <section className="section" id="s11">
         <div className="wrap">
-          <p className="section-key">S11</p>
           <h2>Before and after</h2>
           <Gallery />
         </div>
       </section>
       <section className="section dark" id="s12">
         <div className="wrap">
-          <p className="section-key">S12</p>
           <h2>Sample reviews</h2>
           <div className="reviews">
             {reviews.map((review) => (
@@ -180,7 +175,6 @@ export default function HomePage() {
       </section>
       <section className="section dark" id="service-area">
         <div className="wrap">
-          <p className="section-key">S15</p>
           <h2>Do we serve you?</h2>
           <p>MORAINEX works across the Denver metro.</p>
           <ServiceArea />
@@ -192,7 +186,6 @@ export default function HomePage() {
       </section>
       <section className="section" id="s16">
         <div className="wrap narrow">
-          <p className="section-key">S16</p>
           <h2>Book a visit</h2>
           <form className="stack" method="dialog">
             <p className="demo-note">Demo form: nothing is sent and no one is booked or charged.</p>
@@ -216,7 +209,6 @@ export default function HomePage() {
       </section>
       <section className="section" id="s17">
         <div className="wrap narrow">
-          <p className="section-key">S17</p>
           <h2>Questions before you call</h2>
           <FaqList items={homeFaqs} />
         </div>
@@ -224,3 +216,5 @@ export default function HomePage() {
     </>
   );
 }
+
+export const metadata: Metadata = pageMeta("/", "Home", "Panels, EV chargers, and repairs for Denver-metro homes, with a price range before anyone comes out.");

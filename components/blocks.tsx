@@ -61,7 +61,6 @@ export function EmergencyChecklist({ callCard = false }: { callCard?: boolean })
           <PhoneButton className="btn btn-light btn-block" />
         </div>
       )}
-      <p className="section-key">S3</p>
       <h2>Is this an emergency?</h2>
       <p className="lede">Safety first. If any of these is happening, don&apos;t wait for us.</p>
       <div className="tier tier-hot">
@@ -125,7 +124,6 @@ export function FaqList({
 export function Financing({ id = "financing" }: { id?: string }) {
   return (
     <section className="card finance" id={id}>
-      <p className="section-key">S14</p>
       <h2>Pay over time</h2>
       <p className="price">As low as $[X]/mo for [N] months (sample)</p>
       <p className="disclaimer">Subject to credit approval. Terms vary. Sample only; no lender is connected.</p>
@@ -153,7 +151,6 @@ export function Financing({ id = "financing" }: { id?: string }) {
 export function CareTeaser() {
   return (
     <section className="card plan" id="s13">
-      <p className="section-key">S13</p>
       <h2>Morainex Care (concept)</h2>
       <p>One visit a year to catch problems early, plus a few perks when you need us.</p>
       <ul className="plain-list">

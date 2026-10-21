@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Diagram, Photo } from "@/components/media";
+import { LoadVisual } from "@/components/load-visual";
 import { Disclaimer } from "@/components/blocks";
 import {
   evReady,
@@ -71,9 +72,7 @@ export function EstimateTeaser() {
           ))}
         </div>
       )}
-      <div className="meter" aria-hidden="true">
-        <span style={{ width: `${ready}%` }} />
-      </div>
+      <LoadVisual type={tab} distance={distance} amps={current} target={current === "200" ? "400" : current ? "200" : ""} ready={ready} />
       <p className="range">{label}</p>
       <Disclaimer />
       <Link className="btn btn-light" href={`/estimate?type=${tab}`}>
@@ -276,24 +275,35 @@ export function SmartHome() {
     <div className="smart-grid">
       <div className="floor">
         <svg viewBox="0 0 640 460" role="img" aria-label="Sample floor plan">
-          <rect x="36" y="28" width="420" height="250" rx="10" fill="none" stroke="#a9cdee" strokeWidth="2" />
-          <path d="M250 28 V278 M36 160 H456" stroke="#39424c" strokeWidth="2" />
-          <rect x="36" y="300" width="220" height="120" rx="10" fill="none" stroke="#a9cdee" strokeWidth="2" />
-          <text x="70" y="90" fill="#f2f2ef">
-            Living
-          </text>
-          <text x="290" y="90" fill="#f2f2ef">
-            Kitchen
-          </text>
-          <text x="70" y="210" fill="#f2f2ef">
-            Bed
-          </text>
-          <text x="290" y="210" fill="#f2f2ef">
-            Hall
-          </text>
-          <text x="70" y="360" fill="#f2f2ef">
-            Garage
-          </text>
+          <defs>
+            <pattern id="fp-grid" width="20" height="20" patternUnits="userSpaceOnUse">
+              <path d="M20 0H0V20" fill="none" stroke="rgba(169,205,238,0.07)" />
+            </pattern>
+          </defs>
+          <rect width="640" height="460" fill="url(#fp-grid)" />
+          <g className="fp-walls">
+            <path d="M40 40 H600 V420 H40 Z" />
+            <path d="M250 40 V250 M40 250 H600 M400 250 V420 M250 300 V420" />
+            <path d="M430 40 V180 M430 220 V250" />
+          </g>
+          <g className="fp-wires">
+            <path d="M192 340 V230 H179 V147" />
+            <path d="M192 340 V230 H307 V212" />
+            <path d="M192 340 V230 H448 V129" />
+          </g>
+          <g className="fp-flow">
+            <path d="M192 340 V230 H179 V147" />
+            <path d="M192 340 V230 H307 V212" />
+            <path d="M192 340 V230 H448 V129" />
+          </g>
+          <g className="fp-labels">
+            <text x="64" y="76">LIVING</text>
+            <text x="274" y="76">KITCHEN</text>
+            <text x="454" y="76">BED</text>
+            <text x="274" y="286">HALL</text>
+            <text x="64" y="286">GARAGE</text>
+            <text x="424" y="286">BATH</text>
+          </g>
         </svg>
         {hotspots.map((spot) => (
           <label key={spot.id} className="hotspot" style={{ left: spot.x, top: spot.y }}>
@@ -304,7 +314,7 @@ export function SmartHome() {
       </div>
       <div className="hot-copy">
         {hotspots.map((spot) => (
-          <p key={spot.id} className={`hot-panel hot-${spot.id}`}>
+          <p key={spot.id} className={`hot-panel hot-item-${spot.id}`}>
             <strong>{spot.title}:</strong> {spot.body}
           </p>
         ))}

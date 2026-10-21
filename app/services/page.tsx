@@ -1,9 +1,10 @@
+import { pageMeta } from "@/lib/meta";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { EmergencyChecklist, FaqList } from "@/components/blocks";
 import { commercial, PHONE_DISPLAY, PHONE_TEL, residential, serviceFaqs } from "@/lib/site";
 
-export const metadata: Metadata = { title: "Services" };
+export const metadata: Metadata = pageMeta("/services/", "Services", "Residential and commercial electrical services: panels, EV chargers, lighting, smart home, solar ready, and repairs.");
 
 export default function ServicesPage() {
   return (
@@ -13,7 +14,6 @@ export default function ServicesPage() {
       <input className="sr-only" type="radio" name="mode" id="mode-c" />
       <section className="section finder" id="svc-finder">
         <div className="wrap">
-          <p className="section-key">S1</p>
           <h1>What do you need?</h1>
           <div className="path-tabs">
             <label className="tab" htmlFor="mode-e">
@@ -54,7 +54,6 @@ export default function ServicesPage() {
       </section>
       <section className="section dark" id="urgent">
         <div className="wrap">
-          <p className="section-key">S2</p>
           <EmergencyChecklist callCard />
         </div>
       </section>
@@ -69,7 +68,6 @@ export default function ServicesPage() {
             </label>
           </div>
           <div className="catalog only-r">
-            <p className="section-key">S3</p>
             <h2>Residential</h2>
             {residential.map((service) => (
               <article className="card service-card" id={service.id} key={service.id}>
@@ -89,7 +87,6 @@ export default function ServicesPage() {
             ))}
           </div>
           <div className="catalog only-c">
-            <p className="section-key">S4</p>
             <h2>Commercial</h2>
             {commercial.map((service) => (
               <article className="card service-card" id={service.id} key={service.id}>
@@ -109,7 +106,6 @@ export default function ServicesPage() {
             ))}
           </div>
           <div className="card empty-state" id="s5">
-            <p className="section-key">S5</p>
             <h2>Not listed?</h2>
             <p>Not listed? Tell us what&apos;s going on and we&apos;ll call you back.</p>
             <form className="stack" method="dialog">
@@ -135,7 +131,6 @@ export default function ServicesPage() {
       </section>
       <section className="section" id="s6">
         <div className="wrap narrow">
-          <p className="section-key">S6</p>
           <h2>Questions before you call</h2>
           <FaqList items={serviceFaqs} />
         </div>

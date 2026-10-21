@@ -7,7 +7,6 @@ export function ServiceFinder() {
   return (
     <section className="section finder" id="s2" aria-labelledby="finder-title">
       <div className="wrap">
-        <p className="section-key">S2</p>
         <h2 id="finder-title">What do you need?</h2>
         <div className="chips" role="group" aria-label="Services">
           {residential.map((service) => (

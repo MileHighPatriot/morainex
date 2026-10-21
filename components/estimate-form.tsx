@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { LoadVisual } from "@/components/load-visual";
 import { useEffect, useState } from "react";
 import { DemoNote, Disclaimer } from "@/components/blocks";
 import {
@@ -36,10 +37,21 @@ export function EstimateForm() {
   const [label, setLabel] = useState(PLACEHOLDER_RANGE);
   const [ready, setReady] = useState(0);
   const [sent, setSent] = useState(false);
+  const [vis, setVis] = useState<{ type: "ev" | "panel"; distance: string; amps: string; target: string }>({
+    type: "ev",
+    distance: "",
+    amps: "",
+    target: "",
+  });
 
   const apply = (root: HTMLElement) => {
     const data = read(root);
     const result = data.type === "panel" ? panelReady(data.panel) : evReady(data.ev);
+    setVis(
+      data.type === "panel"
+        ? { type: "panel", distance: "", amps: data.panel.current, target: data.panel.target }
+        : { type: "ev", distance: data.ev.distance, amps: data.ev.amps, target: "" },
+    );
     if (!result) {
       setLabel(PLACEHOLDER_RANGE);
       setReady(0);
@@ -213,9 +225,7 @@ export function EstimateForm() {
 
       <section id="est-range" className="range-card">
         <h2>3 Range</h2>
-        <div className="meter" aria-hidden="true">
-          <span style={{ width: `${ready}%` }} />
-        </div>
+        <LoadVisual {...vis} ready={ready} />
         <p className="range">Your estimate: {label}</p>
         <h3>What&apos;s included</h3>
         <ul className="plain-list include-ev">

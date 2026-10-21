@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
   trailingSlash: true,
   reactStrictMode: true,
   poweredByHeader: false,
+  experimental: { inlineCss: true },
 };
 
 export default nextConfig;

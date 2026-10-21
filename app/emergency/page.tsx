@@ -1,9 +1,10 @@
+import { pageMeta } from "@/lib/meta";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Dial911, DownedLine, PhoneButton } from "@/components/blocks";
 import { emergencyNodes, PHONE_DISPLAY } from "@/lib/site";
 
-export const metadata: Metadata = { title: "Electrical emergency?" };
+export const metadata: Metadata = pageMeta("/emergency/", "Electrical emergency?", "What to do about smoke, a downed line, a hot panel, or water near wiring, and when to call.");
 
 const questions = [
   ["q1", "Do you smell burning or see smoke from anything electrical?"],
@@ -26,7 +27,6 @@ export default function EmergencyPage() {
     <>
       <section className="section dark emergency-hero">
         <div className="wrap narrow">
-          <p className="section-key">S1</p>
           <h1>Electrical emergency?</h1>
           <PhoneButton className="btn btn-light btn-block" />
           <p className="lede">
@@ -36,7 +36,6 @@ export default function EmergencyPage() {
       </section>
       <section className="section" id="s2">
         <div className="wrap">
-          <p className="section-key">S2</p>
           <div className="e-grid">
             {emergencyNodes.map((node) => (
               <a className="e-tile" href={`#${node.id}`} key={node.id}>
@@ -46,19 +45,19 @@ export default function EmergencyPage() {
             ))}
           </div>
           <article className="card" id="e1">
-            <h3>E1 Burning smell or smoke</h3>
+            <h2 className="h3">E1 Burning smell or smoke</h2>
             <p>
               If there&apos;s fire, smoke, or a burning smell, get out now, then <Dial911 /> from outside.
             </p>
             <PhoneButton className="btn btn-primary btn-block">Call {PHONE_DISPLAY} now</PhoneButton>
           </article>
           <article className="card" id="e3">
-            <h3>E3 Hot or buzzing panel</h3>
+            <h2 className="h3">E3 Hot or buzzing panel</h2>
             <p>A panel, breaker, or outlet that&apos;s warm or hot to the touch. Don&apos;t open it or touch it.</p>
             <PhoneButton className="btn btn-primary btn-block" />
           </article>
           <article className="card" id="e4">
-            <h3>E4 Water near wiring</h3>
+            <h2 className="h3">E4 Water near wiring</h2>
             <p>If there&apos;s water near the panel, stay out of the water and keep everyone back.</p>
             <PhoneButton className="btn btn-primary btn-block" />
           </article>
@@ -66,7 +65,6 @@ export default function EmergencyPage() {
       </section>
       <section className="section dark" id="s3">
         <div className="wrap narrow yn">
-          <p className="section-key">S3</p>
           <h2>Is this an emergency?</h2>
           {questions.map(([id, text]) => (
             <fieldset key={id}>
@@ -97,14 +95,12 @@ export default function EmergencyPage() {
       </section>
       <section className="section" id="e2">
         <div className="wrap narrow">
-          <p className="section-key">S4</p>
           <h2>Line down outside</h2>
           <DownedLine />
         </div>
       </section>
       <section className="section" id="s5">
         <div className="wrap narrow">
-          <p className="section-key">S5</p>
           <h2>Stay safe while you wait</h2>
           <ul className="check-list">
             {staySafe.map((item) => (
@@ -115,7 +111,6 @@ export default function EmergencyPage() {
       </section>
       <section className="section dark" id="s6">
         <div className="wrap narrow">
-          <p className="section-key">S6</p>
           <p className="hours">Hours: to be set (concept). This concept site doesn&apos;t list 24/7 service.</p>
           <p className="small">
             This page is general safety guidance for a concept site, not a diagnosis. When in doubt, get out and{" "}

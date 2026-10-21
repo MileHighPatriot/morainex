@@ -18,7 +18,7 @@ function HeroScene() {
     };
     const saveData = nav.connection?.saveData === true;
     const memory = nav.deviceMemory;
-    if (reduce || saveData || typeof memory !== "number" || memory < 4) return;
+    if (reduce || saveData || (typeof memory === "number" && memory < 4)) return;
 
     let stop = () => {};
     let dead = false;
@@ -40,11 +40,18 @@ function HeroScene() {
     };
     let idle = 0;
     let timer = 0;
-    if (win.requestIdleCallback) idle = win.requestIdleCallback(start, { timeout: 1800 });
-    else timer = window.setTimeout(start, 700);
+    const queue = () => {
+      timer = window.setTimeout(() => {
+        if (win.requestIdleCallback) idle = win.requestIdleCallback(start, { timeout: 2500 });
+        else start();
+      }, 2500);
+    };
+    if (document.readyState === "complete") queue();
+    else window.addEventListener("load", queue, { once: true });
 
     return () => {
       dead = true;
+      window.removeEventListener("load", queue);
       if (idle && win.cancelIdleCallback) win.cancelIdleCallback(idle);
       if (timer) window.clearTimeout(timer);
       stop();
@@ -68,7 +75,6 @@ export function Hero() {
         <div className="hero-scrim" />
       </div>
       <div className="hero-card">
-        <p className="section-key">S1</p>
         <p className="eyebrow">Concept project · Colorado electrician, Denver metro</p>
         <h1 id="hero-title">Panels, EV chargers, and repairs for Denver-metro homes.</h1>
         <p className="lede">
