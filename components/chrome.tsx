@@ -17,9 +17,8 @@ export function MotionFlag() {
 export function ConceptBar() {
   return (
     <p className="concept">
-      Concept project: MORAINEX is a fictional Colorado electrician, designed by 5280 Web Solutions to show what an
-      electrical contractor site can do. It&apos;s not a real company. See more at{" "}
-      <a href="https://5280webs.com">5280webs.com</a>
+      Concept project: MORAINEX is a fictional Colorado electrician, designed to show what an electrical contractor
+      site can do. It&apos;s not a real company.
     </p>
   );
 }
