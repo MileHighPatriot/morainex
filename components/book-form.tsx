@@ -1,44 +1,50 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DemoNote } from "@/components/blocks";
-import { services, timeSlots } from "@/lib/site";
+import { services, timeSlots, upcomingDays, upcomingMonths } from "@/lib/site";
 
-type Day = { iso: string; wd: string; mon: string; day: string };
+type Day = ReturnType<typeof upcomingDays>[number];
 
-export function BookForm({ days }: { days: Day[] }) {
+export function BookForm() {
+  // Dates are computed in the browser; a static export would otherwise freeze them at build time.
+  const [days, setDays] = useState<Day[]>([]);
+  const [service, setService] = useState(services[0].id);
   const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    setDays(upcomingDays());
+    const pick = new URLSearchParams(window.location.search).get("service");
+    if (pick && services.some((s) => s.id === pick)) setService(pick);
+  }, []);
 
   return (
     <form
       className="stack"
-      method="dialog"
       onSubmit={(event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        const service = String(data.get("service") || "selected service");
-        const day = String(data.get("day") || "selected day");
-        const time = String(data.get("time") || "selected time");
-        const label = days.find((item) => item.iso === day);
-        const dayText = label ? `${label.wd} ${label.mon} ${label.day}` : day;
+        const name = services.find((s) => s.id === service)?.name ?? "Selected service";
+        const day = days.find((d) => d.iso === data.get("day"));
+        const time = String(data.get("time") || "an open window");
         setMessage(
-          `Demo booking: ${service}, ${dayText}, arrival window ${time} (example). On a real site, this is where you'd get a text before the electrician heads over. Nothing was sent, and no one is booked or charged.`,
+          `Demo booking: ${name}${day ? `, ${day.wd} ${day.mon} ${day.day}` : ""}, arrival ${time}. On a real site you'd get a text when the electrician heads over. Nothing was sent, and no one is booked or charged.`,
         );
       }}
     >
       <DemoNote />
       <label className="field">
-        Service
-        <select name="service" defaultValue={services[0].name}>
-          {services.map((service) => (
-            <option key={service.id} value={service.name}>
-              {service.code} {service.name}
+        What do you need?
+        <select name="service" value={service} onChange={(event) => setService(event.target.value)}>
+          {services.map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.name}
             </option>
           ))}
         </select>
       </label>
       <fieldset>
-        <legend>Date</legend>
+        <legend>Day</legend>
         <div className="days">
           {days.map((day) => (
             <label className="day" key={day.iso}>
@@ -51,7 +57,7 @@ export function BookForm({ days }: { days: Day[] }) {
         </div>
       </fieldset>
       <fieldset>
-        <legend>Time</legend>
+        <legend>Arrival window</legend>
         <div className="slots">
           {timeSlots.map((slot) => (
             <label className="slot" key={slot}>
@@ -70,10 +76,10 @@ export function BookForm({ days }: { days: Day[] }) {
         <input name="phone" type="tel" autoComplete="tel" inputMode="tel" />
       </label>
       <label className="field">
-        Notes
-        <textarea name="notes" rows={4} />
+        Anything we should know?
+        <textarea name="notes" rows={3} />
       </label>
-      <button className="btn btn-primary" type="submit">
+      <button className="btn btn-amber btn-lg" type="submit">
         Book my visit
       </button>
       {message ? (
@@ -85,12 +91,14 @@ export function BookForm({ days }: { days: Day[] }) {
   );
 }
 
-export function MembershipForm({ months }: { months: string[] }) {
+export function MembershipForm() {
+  const [months, setMonths] = useState<string[]>([]);
   const [done, setDone] = useState(false);
+  useEffect(() => setMonths(upcomingMonths()), []);
+
   return (
     <form
       className="stack"
-      method="dialog"
       onSubmit={(event) => {
         event.preventDefault();
         setDone(true);
@@ -110,7 +118,7 @@ export function MembershipForm({ months }: { months: string[] }) {
         <input inputMode="numeric" autoComplete="postal-code" maxLength={10} />
       </label>
       <fieldset>
-        <legend>Start month</legend>
+        <legend>First safety check</legend>
         <div className="options">
           {months.map((month) => (
             <label className="opt" key={month}>
@@ -120,7 +128,7 @@ export function MembershipForm({ months }: { months: string[] }) {
           ))}
         </div>
       </fieldset>
-      <button className="btn btn-primary" type="submit">
+      <button className="btn btn-amber btn-lg" type="submit">
         Join Morainex Care
       </button>
       {done ? (

@@ -4,6 +4,10 @@ Concept project. MORAINEX is a fictional Colorado electrician for the Denver met
 
 Live site: https://milehighpatriot.github.io/morainex/
 
+## Hero
+
+The home hero starts with the house dark and switches its lights on zone by zone. `scripts/hero_layers.py` builds `house-off` plus four additive light layers (`soffit`, `upper`, `interior`, `wash`) from `hero-2048.webp`; the page stacks them with `mix-blend-mode: plus-lighter`, so all four at full opacity reproduce the original photo. Rerun the script if the hero photo changes.
+
 ## Scripts
 
 ```bash

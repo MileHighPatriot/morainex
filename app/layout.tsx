@@ -1,21 +1,26 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
-import { Manrope, Sora } from "next/font/google";
-import { CallBar, ConceptBar, Footer, Header, MotionFlag } from "@/components/chrome";
+import { Inter, Inter_Tight, JetBrains_Mono } from "next/font/google";
+import { CallBar, ConceptBar, Footer, Header, Reveal } from "@/components/chrome";
 import "./globals.css";
-import "./premium.css";
 
-const sora = Sora({
+const display = Inter_Tight({
   subsets: ["latin"],
-  weight: ["300", "400", "600", "700"],
-  variable: "--font-sora",
+  weight: ["500", "600", "700"],
+  variable: "--font-display",
   display: "swap",
 });
 
-const manrope = Manrope({
+const body = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-manrope",
+  variable: "--font-body",
+  display: "swap",
+});
+
+const mono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-mono",
   display: "swap",
 });
 
@@ -53,12 +58,12 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#1c2024",
+  themeColor: "#0b0e12",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={`${sora.variable} ${manrope.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${display.variable} ${body.variable} ${mono.variable}`}>
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -72,7 +77,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
       </head>
       <body>
-        <MotionFlag />
+        <Reveal />
         <a className="skip" href="#main">
           Skip to content
         </a>

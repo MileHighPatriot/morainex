@@ -26,10 +26,8 @@ export function money(n: number) {
 }
 
 export function rangeText(low: number, high: number) {
-  return `${money(low)} to ${money(high)} (sample)`;
+  return `${money(low)} – ${money(high)}`;
 }
-
-export const PLACEHOLDER_RANGE = "$[low] to $[high] (sample)";
 
 export function evReady(input: EvInput, partial = false): RangeResult | null {
   if (!partial && (!input.owned || !input.distance || !input.amps || !input.place)) return null;
@@ -127,16 +125,17 @@ export function panelReady(input: PanelInput, partial = false): RangeResult | nu
 }
 
 export const evIncluded = [
+  "Load check before anything is bought",
   "Level 2 charger on its own circuit",
-  "Load check first",
-  "Mounting where the cord reaches",
-  "Permit handling when the work needs one",
+  "Mounted where the cord actually reaches",
+  "Permit pulled and inspection booked",
 ];
 
 export const panelIncluded = [
   "Panel sized to the target you pick",
-  "Labeled breakers",
-  "Permit and inspection booking when the work needs one",
+  "Utility disconnect and reconnect scheduled",
+  "Every breaker labeled in a typed directory",
+  "Permit pulled and inspection booked",
 ];
 
 export const couldChange = "panel condition, wire run length, permit requirements";

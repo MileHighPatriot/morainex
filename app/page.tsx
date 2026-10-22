@@ -1,13 +1,20 @@
-import { pageMeta } from "@/lib/meta";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CareTeaser, EmergencyChecklist, Financing, FaqList } from "@/components/blocks";
-import { ServiceFinder } from "@/components/finder";
-import { StatsBand } from "@/components/stats";
+import { Arrow, Bolt, CarePlan, FaqList, Financing, PhoneButton, SectionHead } from "@/components/blocks";
 import { Hero } from "@/components/hero";
-import { EstimateTeaser, Gallery, JobTracker, ServiceArea, SmartHome } from "@/components/home-islands";
+import { LightCompare, QuickPrice, ServiceArea } from "@/components/home-tools";
 import { Photo } from "@/components/media";
-import { asset, homeFaqs, reviews } from "@/lib/site";
+import { pageMeta } from "@/lib/meta";
+import { asset, commercial, homeFaqs, residential, reviews, steps } from "@/lib/site";
+
+export const metadata: Metadata = pageMeta(
+  "/",
+  "Home",
+  "Panels, EV chargers, lighting, and repairs for Denver-metro homes, with a price range before anyone comes out.",
+);
+
+const featured = residential.filter((s) => s.photo);
+const compact = [...residential.filter((s) => !s.photo), commercial[0], commercial[2]];
 
 export default function HomePage() {
   return (
@@ -15,206 +22,199 @@ export default function HomePage() {
       <link
         rel="preload"
         as="image"
-        href={asset("/images/hero-1200.webp")}
-        imageSrcSet={`${asset("/images/hero-800.webp")} 800w, ${asset("/images/hero-1200.webp")} 1200w, ${asset("/images/hero-1600.webp")} 1600w, ${asset("/images/hero-2048.webp")} 2048w`}
-        imageSizes="100vw"
+        href={asset("/images/house-off-1280.webp")}
+        imageSrcSet={`${asset("/images/house-off-1280.webp")} 1280w, ${asset("/images/house-off-2048.webp")} 2048w`}
+        imageSizes="(max-width: 760px) 240vw, 120vw"
         fetchPriority="high"
       />
       <Hero />
-      <StatsBand />
-      <ServiceFinder />
-      <section className="section dark">
-        <div className="wrap">
-          <EmergencyChecklist />
+
+      <aside className="alert" aria-label="Electrical emergency">
+        <div className="wrap alert-row">
+          <p>
+            <span className="alert-dot" aria-hidden="true" />
+            <strong>Burning smell, sparks, or a hot panel?</strong> Get everyone out and call 911 first.
+          </p>
+          <Link href="/emergency/">
+            What to do next <Arrow />
+          </Link>
         </div>
-      </section>
-      <section className="section" id="s4" aria-label="Proof">
+      </aside>
+
+      <section className="section paper" id="services">
         <div className="wrap">
-          <ul className="proof">
-            <li>2-year workmanship warranty (example)</li>
-            <li>Arrival window given when you book (example)</li>
-            <li>Licensed and insured · Sample license # (not real)</li>
-          </ul>
-        </div>
-      </section>
-      <section className="section dark" id="s5">
-        <div className="wrap">
-          <h2>See a price range before anyone comes out.</h2>
-          <EstimateTeaser />
-        </div>
-      </section>
-      <section className="section" id="ev">
-        <div className="wrap">
-          <div className="ev-grid">
-            <div>
-              <h2>EV charging at home</h2>
-              <ol className="steps">
-                <li>
-                  <span>1</span>
-                  <div>
-                    <h3>Level 2 install</h3>
-                    <p>A 240-volt charger in your garage or driveway, mounted where your cord actually reaches.</p>
-                  </div>
-                </li>
-                <li>
-                  <span>2</span>
-                  <div>
-                    <h3>Load check</h3>
-                    <p>We check whether your panel can carry a charger before you buy one, so there are no surprises.</p>
-                  </div>
-                </li>
-                <li>
-                  <span>3</span>
-                  <div>
-                    <h3>Rebate help</h3>
-                    <p>
-                      We point you to the utility and state rebates you may qualify for and help with the paperwork.
-                      (Example. Rebates change, so check current programs.)
-                    </p>
-                  </div>
-                </li>
-              </ol>
-              <Link className="btn btn-primary" href="/estimate?type=ev">
-                Price an EV charger
+          <SectionHead kicker="What we wire" title="Every circuit in the house, done like it matters.">
+            Pick a breaker. Each one is a service with a sample price, so you know where you stand before you call.
+          </SectionHead>
+          <div className="board">
+            {featured.map((s, i) => (
+              <Link
+                key={s.id}
+                href={`/services/#${s.id}`}
+                className={`breaker-card has-photo bc-${i}`}
+                data-reveal
+                style={{ ["--d" as string]: `${i * 60}ms` }}
+              >
+                <div className="bc-photo">
+                  <Photo
+                    name={s.photo!}
+                    alt=""
+                    sizes={i < 2 ? "(min-width: 900px) 50vw, 100vw" : "(min-width: 900px) 33vw, 100vw"}
+                  />
+                </div>
+                <div className="bc-body">
+                  <p className="bc-top">
+                    <span className="ckt">CKT {s.ckt}</span>
+                    <span className="flip" aria-hidden="true">
+                      <span />
+                    </span>
+                  </p>
+                  <h3>{s.name}</h3>
+                  <p className="bc-short">{s.short}</p>
+                  <p className="bc-price">{s.price}</p>
+                </div>
               </Link>
-            </div>
-            <div className="ev-visual">
-              <Photo
-                name="ev-charger"
-                alt="Wall-mounted electric vehicle charger beside a pale sedan in a garage, MORAINEX concept"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-      <section className="section dark" id="s7">
-        <div className="wrap">
-          <h2>Smart home</h2>
-          <SmartHome />
-          <Photo
-            name="smart-control"
-            alt="Wall-mounted smart home control screen in a dim room, MORAINEX concept"
-            className="smart-photo"
-          />
-        </div>
-      </section>
-      <section className="section" id="s8">
-        <div className="wrap solar-grid">
-          <div>
-            <h2>Get your house ready for solar</h2>
-            <ul className="plain-list solar-list">
-              <li>Panel prep, so your service can take solar later without a second upgrade</li>
-              <li>Battery backup wiring for the circuits you can&apos;t lose</li>
-              <li>Inverter tie-in, done to code and inspected</li>
-            </ul>
-            <Link className="btn btn-primary" href="/book">
-              Book a solar-ready check
-            </Link>
-          </div>
-          <Photo name="solar" alt="Dark rooftop solar array on a house with a mountain view, MORAINEX concept" />
-        </div>
-      </section>
-      <section className="section dark" id="s9" aria-label="Process">
-        <div className="wrap">
-          <ol className="process">
-            <li>
-              <h3>Call</h3>
-              <p>Tell us what&apos;s going on. We give you a price range and an arrival window.</p>
-            </li>
-            <li>
-              <h3>Visit</h3>
-              <p>A licensed electrician checks it in person.</p>
-            </li>
-            <li>
-              <h3>Quote</h3>
-              <p>You get a written price before any work starts.</p>
-            </li>
-            <li>
-              <h3>Done</h3>
-              <p>Work finished, permit closed, and inspected when it&apos;s required.</p>
-            </li>
-          </ol>
-          <div className="rail" aria-hidden="true">
-            <span className="rail-fill" />
-          </div>
-        </div>
-      </section>
-      <section className="section" id="s10">
-        <div className="wrap">
-          <h2>Know where your job is.</h2>
-          <p>Every job gets a tracker you can check from your phone.</p>
-          <JobTracker />
-          <p className="small">Sample job. Times and numbers are examples.</p>
-        </div>
-      </section>
-      <section className="section" id="s11">
-        <div className="wrap">
-          <h2>Before and after</h2>
-          <Gallery />
-        </div>
-      </section>
-      <section className="section dark" id="s12">
-        <div className="wrap">
-          <h2>Sample reviews</h2>
-          <div className="reviews">
-            {reviews.map((review) => (
-              <figure key={review.who} className="review">
-                <p className="review-label">Sample review. MORAINEX is a concept company.</p>
-                <blockquote>{review.quote}</blockquote>
-                <figcaption>{review.who}</figcaption>
-              </figure>
+            ))}
+            {compact.map((s, i) => (
+              <Link
+                key={s.id}
+                href={`/services/#${s.id}`}
+                className="breaker-card"
+                data-reveal
+                style={{ ["--d" as string]: `${i * 60}ms` }}
+              >
+                <p className="bc-top">
+                  <span className="ckt">CKT {s.ckt}</span>
+                  <span className="flip" aria-hidden="true">
+                    <span />
+                  </span>
+                </p>
+                <h3>{s.name}</h3>
+                <p className="bc-short">{s.short}</p>
+                <p className="bc-price">{s.price}</p>
+              </Link>
             ))}
           </div>
-        </div>
-      </section>
-      <section className="section" id="s13-wrap">
-        <div className="wrap split-2">
-          <CareTeaser />
-          <Financing />
-        </div>
-      </section>
-      <section className="section dark" id="service-area">
-        <div className="wrap">
-          <h2>Do we serve you?</h2>
-          <p>MORAINEX works across the Denver metro.</p>
-          <ServiceArea />
-          <p className="map-caption">
-            Denver · Aurora · Lakewood · Arvada · Westminster · Thornton · Centennial · Littleton · Englewood · Golden
-            (example area)
+          <p className="board-foot" data-reveal>
+            <Link className="link-arrow" href="/services/">
+              All home and business services <Arrow />
+            </Link>
           </p>
         </div>
       </section>
-      <section className="section" id="s16">
-        <div className="wrap narrow">
-          <h2>Book a visit</h2>
-          <form className="stack" method="dialog">
-            <p className="demo-note">Demo form: nothing is sent and no one is booked or charged.</p>
-            <label className="field">
-              Name
-              <input type="text" autoComplete="name" />
-            </label>
-            <label className="field">
-              Phone
-              <input type="tel" autoComplete="tel" inputMode="tel" />
-            </label>
-            <label className="field">
-              What do you need?
-              <input type="text" />
-            </label>
-            <Link className="btn btn-primary" href="/book">
-              Pick a time
-            </Link>
-          </form>
+
+      <section className="section night" id="lighting">
+        <div className="wrap">
+          <SectionHead kicker="Lighting design" title={<>Same house. <span className="glow">Flip the breaker.</span></>}>
+            Linear LED in the soffits, wall-wash uplights on the stone, and recessed cans on scenes. Lighting is the part
+            of the job people actually see, so we treat it like design work.
+          </SectionHead>
+          <LightCompare />
+          <ul className="spec-row" data-reveal>
+            <li>
+              <b>2700 K</b>
+              <span>Warm white outside, so the house glows instead of glares</span>
+            </li>
+            <li>
+              <b>4 circuits</b>
+              <span>Soffit, eave, wash, and interior, each on its own dimmer</span>
+            </li>
+            <li>
+              <b>Photocell</b>
+              <span>On at dusk, off at midnight, without an app</span>
+            </li>
+          </ul>
         </div>
       </section>
-      <section className="section" id="s17">
-        <div className="wrap narrow">
-          <h2>Questions before you call</h2>
+
+      <section className="section ink" id="price">
+        <div className="wrap">
+          <SectionHead kicker="Price it first" title="Know the number before we knock.">
+            Most electricians won&apos;t say a price until they&apos;re standing in your garage. Here&apos;s a sample
+            range right now.
+          </SectionHead>
+          <QuickPrice />
+        </div>
+      </section>
+
+      <section className="section paper" id="process">
+        <div className="wrap">
+          <SectionHead kicker="How a job runs" title="Four steps. No surprises in any of them." />
+          <ol className="steps" data-reveal>
+            {steps.map((step, i) => (
+              <li key={step.name} style={{ ["--d" as string]: `${i * 140}ms` }}>
+                <span className="step-node">{String(i + 1).padStart(2, "0")}</span>
+                <h3>{step.name}</h3>
+                <p>{step.body}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <section className="section paper tight-top" id="reviews">
+        <div className="wrap">
+          <div className="reviews">
+            {reviews.map((r, i) => (
+              <figure key={r.who} className="review" data-reveal style={{ ["--d" as string]: `${i * 90}ms` }}>
+                <p className="stars" aria-label="5 out of 5">
+                  ★★★★★
+                </p>
+                <blockquote>{r.quote}</blockquote>
+                <figcaption>
+                  <b>{r.who}</b> · {r.where}
+                  <span>{r.job}</span>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+          <p className="fine center">Sample reviews. MORAINEX is a concept company.</p>
+        </div>
+      </section>
+
+      <section className="section night" id="plans">
+        <div className="wrap">
+          <SectionHead kicker="Plans and payments" title="Easier to say yes to." />
+          <div className="plans">
+            <CarePlan />
+            <Financing />
+          </div>
+        </div>
+      </section>
+
+      <section className="section ink" id="area">
+        <div className="wrap">
+          <SectionHead kicker="Service area" title="Ten cities. One crew that knows them.">
+            Denver, Aurora, Lakewood, and the rest of the metro, from Golden to the plains.
+          </SectionHead>
+          <ServiceArea />
+        </div>
+      </section>
+
+      <section className="section paper" id="faq">
+        <div className="wrap faq-grid">
+          <SectionHead kicker="Before you call" title="Questions people ask us first." />
           <FaqList items={homeFaqs} />
+        </div>
+      </section>
+
+      <section className="final">
+        <div className="final-media" aria-hidden="true">
+          <Photo name="hero" alt="" sizes="100vw" />
+        </div>
+        <div className="wrap final-copy" data-reveal>
+          <p className="kicker">
+            <Bolt /> Ready when you are
+          </p>
+          <h2>Let&apos;s get your house wired right.</h2>
+          <div className="hero-actions">
+            <Link className="btn btn-amber btn-lg" href="/book/">
+              Book a visit <Arrow />
+            </Link>
+            <PhoneButton className="btn btn-glass btn-lg" />
+          </div>
         </div>
       </section>
     </>
   );
 }
-
-export const metadata: Metadata = pageMeta("/", "Home", "Panels, EV chargers, and repairs for Denver-metro homes, with a price range before anyone comes out.");

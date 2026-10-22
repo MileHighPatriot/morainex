@@ -1,294 +1,200 @@
 "use client";
 
 import Link from "next/link";
-import { LoadVisual } from "@/components/load-visual";
 import { useEffect, useState } from "react";
-import { DemoNote, Disclaimer } from "@/components/blocks";
-import {
-  couldChange,
-  evIncluded,
-  evReady,
-  panelIncluded,
-  panelReady,
-  PLACEHOLDER_RANGE,
-  rangeText,
-} from "@/lib/estimate";
+import { Arrow, DemoNote, Disclaimer } from "@/components/blocks";
+import { couldChange, evIncluded, evReady, panelIncluded, panelReady, rangeText } from "@/lib/estimate";
 
-function read(root: HTMLElement) {
-  const value = (name: string) =>
-    (root.querySelector(`input[name="${name}"]:checked`) as HTMLInputElement | null)?.value ?? "";
-  return {
-    type: value("type") || "ev",
-    ev: {
-      owned: value("owned"),
-      distance: value("distance"),
-      amps: value("amps"),
-      place: value("place"),
-    },
-    panel: {
-      current: value("current"),
-      target: value("target"),
-      age: value("age"),
-    },
-  };
+type Choice = readonly (readonly [string, string])[];
+
+const ev: { name: "owned" | "distance" | "amps" | "place"; legend: string; options: Choice }[] = [
+  { name: "owned", legend: "Do you already have the charger?", options: [["yes", "Yes"], ["no", "Not yet"]] },
+  {
+    name: "distance",
+    legend: "How far is the panel from where you park?",
+    options: [["short", "Under 25 ft"], ["mid", "25 – 75 ft"], ["long", "Over 75 ft"]],
+  },
+  {
+    name: "amps",
+    legend: "Panel size",
+    options: [["100", "100 A"], ["150", "150 A"], ["200", "200 A"], ["unsure", "Not sure"]],
+  },
+  { name: "place", legend: "Garage or outdoor?", options: [["garage", "Garage"], ["outdoor", "Outdoor"]] },
+];
+
+const panel: { name: "current" | "target" | "age"; legend: string; options: Choice }[] = [
+  {
+    name: "current",
+    legend: "Panel size now",
+    options: [["100", "100 A"], ["150", "150 A"], ["200", "200 A"], ["unsure", "Not sure"]],
+  },
+  { name: "target", legend: "Size you want", options: [["200", "200 A"], ["400", "400 A"]] },
+  {
+    name: "age",
+    legend: "About how old is the house?",
+    options: [["old", "Before 1970"], ["mid", "1970 – 1999"], ["new", "2000 or newer"], ["unsure", "Not sure"]],
+  },
+];
+
+function Options({
+  name,
+  legend,
+  options,
+  value,
+  onPick,
+}: {
+  name: string;
+  legend: string;
+  options: Choice;
+  value: string;
+  onPick: (v: string) => void;
+}) {
+  return (
+    <fieldset>
+      <legend>{legend}</legend>
+      <div className="options">
+        {options.map(([v, text]) => (
+          <label className="opt" key={v}>
+            <input type="radio" name={name} value={v} checked={value === v} onChange={() => onPick(v)} />
+            {text}
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  );
 }
 
 export function EstimateForm() {
-  const [label, setLabel] = useState(PLACEHOLDER_RANGE);
-  const [ready, setReady] = useState(0);
+  const [type, setType] = useState<"ev" | "panel">("ev");
+  const [evIn, setEv] = useState({ owned: "", distance: "", amps: "", place: "" });
+  const [panelIn, setPanel] = useState({ current: "", target: "", age: "" });
   const [sent, setSent] = useState(false);
-  const [vis, setVis] = useState<{ type: "ev" | "panel"; distance: string; amps: string; target: string }>({
-    type: "ev",
-    distance: "",
-    amps: "",
-    target: "",
-  });
-
-  const apply = (root: HTMLElement) => {
-    const data = read(root);
-    const result = data.type === "panel" ? panelReady(data.panel) : evReady(data.ev);
-    setVis(
-      data.type === "panel"
-        ? { type: "panel", distance: "", amps: data.panel.current, target: data.panel.target }
-        : { type: "ev", distance: data.ev.distance, amps: data.ev.amps, target: "" },
-    );
-    if (!result) {
-      setLabel(PLACEHOLDER_RANGE);
-      setReady(0);
-      return;
-    }
-    setLabel(rangeText(result.low, result.high));
-    setReady(result.ready);
-  };
 
   useEffect(() => {
-    const type = new URLSearchParams(window.location.search).get("type");
-    const root = document.getElementById("estimator");
-    if (!(root instanceof HTMLElement)) return;
-    if (type === "panel") {
-      const input = root.querySelector<HTMLInputElement>('input[name="type"][value="panel"]');
-      if (input) input.checked = true;
-    }
-    apply(root);
+    if (new URLSearchParams(window.location.search).get("type") === "panel") setType("panel");
   }, []);
 
+  const result = type === "ev" ? evReady(evIn) : panelReady(panelIn);
+  const preview = type === "ev" ? evReady(evIn, true) : panelReady(panelIn, true);
+  const answers = type === "ev" ? Object.values(evIn) : Object.values(panelIn);
+  const answered = answers.filter(Boolean).length;
+
   return (
-    <div
-      id="estimator"
-      className="estimator"
-      onChange={(event) => {
-        const root = event.currentTarget;
-        apply(root);
-      }}
-    >
-      <ol className="step-rail">
-        <li>
-          <a href="#est-type">1 Type</a>
-        </li>
-        <li>
-          <a href="#est-details">2 Details</a>
-        </li>
-        <li>
-          <a href="#est-range">3 Range</a>
-        </li>
-        <li>
-          <a href="#est-send">4 Send</a>
-        </li>
-      </ol>
+    <div className="estimator">
+      <div className="est-steps">
+        <section className="card est-block">
+          <h2>
+            <span>1</span> What are we pricing?
+          </h2>
+          <div className="type-grid">
+            {(
+              [
+                ["ev", "EV charger"],
+                ["panel", "Panel upgrade"],
+              ] as const
+            ).map(([v, text]) => (
+              <label className="opt type-tile" key={v}>
+                <input type="radio" name="type" value={v} checked={type === v} onChange={() => setType(v)} />
+                {text}
+              </label>
+            ))}
+          </div>
+        </section>
 
-      <section id="est-type">
-        <h2>1 Type</h2>
-        <div className="type-grid">
-          <label className="type-tile">
-            <input type="radio" name="type" value="ev" defaultChecked />
-            EV charger install
-          </label>
-          <label className="type-tile">
-            <input type="radio" name="type" value="panel" />
-            Panel upgrade
-          </label>
-        </div>
-      </section>
+        <section className="card est-block">
+          <h2>
+            <span>2</span> A few details
+          </h2>
+          {type === "ev"
+            ? ev.map((q) => (
+                <Options
+                  key={q.name}
+                  {...q}
+                  value={evIn[q.name]}
+                  onPick={(v) => setEv((s) => ({ ...s, [q.name]: v }))}
+                />
+              ))
+            : panel.map((q) => (
+                <Options
+                  key={q.name}
+                  {...q}
+                  value={panelIn[q.name]}
+                  onPick={(v) => setPanel((s) => ({ ...s, [q.name]: v }))}
+                />
+              ))}
+        </section>
 
-      <section id="est-details">
-        <h2>2 Details</h2>
-        <div className="detail-block detail-ev">
-          <h3>EV charger install</h3>
-          <fieldset>
-            <legend>Do you already have the charger?</legend>
-            <div className="options">
-              <label className="opt">
-                <input type="radio" name="owned" value="yes" />
-                Yes
-              </label>
-              <label className="opt">
-                <input type="radio" name="owned" value="no" />
-                No
-              </label>
-            </div>
-          </fieldset>
-          <fieldset>
-            <legend>How far is the panel from where you&apos;ll park?</legend>
-            <div className="options">
-              {[
-                ["short", "Under 25 ft"],
-                ["mid", "25 to 75 ft"],
-                ["long", "Over 75 ft"],
-              ].map(([value, text]) => (
-                <label className="opt" key={value}>
-                  <input type="radio" name="distance" value={value} />
-                  {text}
-                </label>
-              ))}
-            </div>
-          </fieldset>
-          <fieldset>
-            <legend>Panel size</legend>
-            <div className="options">
-              {[
-                ["100", "100 amps"],
-                ["150", "150 amps"],
-                ["200", "200 amps"],
-                ["unsure", "Not sure"],
-              ].map(([value, text]) => (
-                <label className="opt" key={value}>
-                  <input type="radio" name="amps" value={value} />
-                  {text}
-                </label>
-              ))}
-            </div>
-          </fieldset>
-          <fieldset>
-            <legend>Garage or outdoor?</legend>
-            <div className="options">
-              <label className="opt">
-                <input type="radio" name="place" value="garage" />
-                Garage
-              </label>
-              <label className="opt">
-                <input type="radio" name="place" value="outdoor" />
-                Outdoor
-              </label>
-            </div>
-          </fieldset>
-        </div>
-        <div className="detail-block detail-panel">
-          <h3>Panel upgrade</h3>
-          <fieldset>
-            <legend>Current panel size</legend>
-            <div className="options">
-              {[
-                ["100", "100 amps"],
-                ["150", "150 amps"],
-                ["200", "200 amps"],
-                ["unsure", "Not sure"],
-              ].map(([value, text]) => (
-                <label className="opt" key={value}>
-                  <input type="radio" name="current" value={value} />
-                  {text}
-                </label>
-              ))}
-            </div>
-          </fieldset>
-          <fieldset>
-            <legend>Target size</legend>
-            <div className="options">
-              <label className="opt">
-                <input type="radio" name="target" value="200" />
-                200 amps
-              </label>
-              <label className="opt">
-                <input type="radio" name="target" value="400" />
-                400 amps
-              </label>
-            </div>
-          </fieldset>
-          <fieldset>
-            <legend>About how old is the house?</legend>
-            <div className="options">
-              {[
-                ["old", "Before 1970"],
-                ["mid", "1970 to 1999"],
-                ["new", "2000 or newer"],
-                ["unsure", "Not sure"],
-              ].map(([value, text]) => (
-                <label className="opt" key={value}>
-                  <input type="radio" name="age" value={value} />
-                  {text}
-                </label>
-              ))}
-            </div>
-          </fieldset>
-          <p>Permits: we handle them.</p>
-        </div>
-      </section>
+        <section className="card est-block" id="send">
+          <h2>
+            <span>3</span> Send it to us
+          </h2>
+          <form
+            className="stack"
+            onSubmit={(event) => {
+              event.preventDefault();
+              setSent(true);
+            }}
+          >
+            <DemoNote />
+            <label className="field">
+              Name
+              <input type="text" autoComplete="name" />
+            </label>
+            <label className="field">
+              Phone
+              <input type="tel" autoComplete="tel" inputMode="tel" />
+            </label>
+            <label className="field">
+              ZIP
+              <input inputMode="numeric" autoComplete="postal-code" maxLength={10} />
+            </label>
+            <button className="btn btn-amber" type="submit">
+              Request a walkthrough
+            </button>
+            {sent ? (
+              <p className="confirm" role="status">
+                Demo only. Nothing was sent, and no one is booked or charged.
+              </p>
+            ) : null}
+          </form>
+        </section>
+      </div>
 
-      <section id="est-range" className="range-card">
-        <h2>3 Range</h2>
-        <LoadVisual {...vis} ready={ready} />
-        <p className="range">Your estimate: {label}</p>
+      <aside className="card est-result" aria-live="polite">
+        <div className="progress" aria-hidden="true">
+          {answers.map((a, i) => (
+            <span key={i} className={i < answered ? "is-on" : undefined} />
+          ))}
+        </div>
+        <p className="kicker">{result ? "Your sample range" : "Ballpark so far"}</p>
+        <p className="quick-range">
+          {result
+            ? rangeText(result.low, result.high)
+            : preview
+              ? rangeText(preview.low, preview.high)
+              : type === "ev"
+                ? "$1,600 – $11,900"
+                : "$2,100 – $9,600"}
+        </p>
+        <p className="quick-note">
+          {result
+            ? "Every question answered. A walkthrough turns this into a written price."
+            : `Answer ${answers.length - answered} more ${answers.length - answered === 1 ? "question" : "questions"} to narrow it down.`}
+        </p>
         <h3>What&apos;s included</h3>
-        <ul className="plain-list include-ev">
-          {evIncluded.map((item) => (
+        <ul className="ticks">
+          {(type === "ev" ? evIncluded : panelIncluded).map((item) => (
             <li key={item}>{item}</li>
           ))}
         </ul>
-        <ul className="plain-list include-panel">
-          {panelIncluded.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-        <p>What could change it: {couldChange}.</p>
+        <p className="fine">What could change it: {couldChange}.</p>
         <Disclaimer />
-      </section>
-
-      <section id="est-send">
-        <h2>4 Send</h2>
-        <form
-          className="stack"
-          method="dialog"
-          onSubmit={(event) => {
-            event.preventDefault();
-            setSent(true);
-          }}
-        >
-          <DemoNote />
-          <label className="field">
-            Name
-            <input type="text" autoComplete="name" />
-          </label>
-          <label className="field">
-            Phone
-            <input type="tel" autoComplete="tel" inputMode="tel" />
-          </label>
-          <label className="field">
-            ZIP
-            <input inputMode="numeric" autoComplete="postal-code" maxLength={10} />
-          </label>
-          <fieldset>
-            <legend>Best time</legend>
-            <div className="options">
-              {["Morning", "Midday", "Afternoon", "Evening"].map((slot) => (
-                <label className="opt" key={slot}>
-                  <input type="radio" name="when" value={slot} />
-                  {slot}
-                </label>
-              ))}
-            </div>
-          </fieldset>
-          <button className="btn btn-primary" type="submit">
-            Book a visit
-          </button>
-          <Link className="text-link" href="/book#financing">
-            See financing
+        <p style={{ marginTop: 18 }}>
+          <Link className="link-arrow" href="/book/#financing">
+            See financing <Arrow />
           </Link>
-          {sent ? (
-            <p className="confirm" role="status">
-              Demo only. Nothing was sent, and no one is booked or charged.
-            </p>
-          ) : null}
-        </form>
-      </section>
+        </p>
+      </aside>
     </div>
   );
 }

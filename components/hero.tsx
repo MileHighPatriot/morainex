@@ -1,100 +1,144 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef } from "react";
-import { Photo } from "@/components/media";
+import { useEffect, useRef, useState } from "react";
+import { Arrow } from "@/components/blocks";
+import { houseSrc, LIGHT_ZONES } from "@/components/media";
 import { PHONE_DISPLAY, PHONE_TEL } from "@/lib/site";
 
-function HeroScene() {
-  const ref = useRef<HTMLCanvasElement>(null);
+// Callouts sit in photo coordinates (fractions of the 2048 x 1152 frame).
+const callouts = [
+  { x: 0.863, y: 0.152, label: "Eave line", spec: "24 V LED · CKT 09", side: "left" },
+  { x: 0.792, y: 0.466, label: "Soffit strip", spec: "2700 K · dimmable · CKT 07", side: "left" },
+  { x: 0.735, y: 0.598, label: "Recessed cans", spec: "Scene: Evening · CKT 12", side: "left" },
+  { x: 0.905, y: 0.74, label: "Wall wash", spec: "Photocell · CKT 14", side: "left" },
+] as const;
 
-  useEffect(() => {
-    const canvas = ref.current;
-    if (!canvas) return;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const nav = navigator as Navigator & {
-      deviceMemory?: number;
-      connection?: { saveData?: boolean };
-    };
-    const saveData = nav.connection?.saveData === true;
-    const memory = nav.deviceMemory;
-    if (reduce || saveData || (typeof memory === "number" && memory < 4)) return;
-
-    let stop = () => {};
-    let dead = false;
-    const start = () => {
-      if (dead || !ref.current) return;
-      const hero = ref.current.closest(".hero");
-      if (!(hero instanceof HTMLElement)) return;
-      import("@/lib/grid-scene")
-        .then((mod) => {
-          if (dead || !ref.current) return;
-          stop = mod.mountGrid(ref.current, hero);
-        })
-        .catch(() => {});
-    };
-
-    const win = window as Window & {
-      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
-      cancelIdleCallback?: (id: number) => void;
-    };
-    let idle = 0;
-    let timer = 0;
-    const queue = () => {
-      timer = window.setTimeout(() => {
-        if (win.requestIdleCallback) idle = win.requestIdleCallback(start, { timeout: 2500 });
-        else start();
-      }, 2500);
-    };
-    if (document.readyState === "complete") queue();
-    else window.addEventListener("load", queue, { once: true });
-
-    return () => {
-      dead = true;
-      window.removeEventListener("load", queue);
-      if (idle && win.cancelIdleCallback) win.cancelIdleCallback(idle);
-      if (timer) window.clearTimeout(timer);
-      stop();
-    };
-  }, []);
-
-  return <canvas ref={ref} className="hero-canvas" aria-hidden="true" />;
-}
+const sizes = "(max-width: 760px) 240vw, 120vw";
 
 export function Hero() {
+  const [on, setOn] = useState(false);
+  const [ready, setReady] = useState(false);
+  const stage = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const root = stage.current;
+    if (!root) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const imgs = Array.from(root.querySelectorAll("img"));
+    let done = false;
+    const go = () => {
+      if (done) return;
+      done = true;
+      setReady(true);
+      if (reduce) setOn(true);
+      else window.setTimeout(() => setOn(true), 450);
+    };
+    Promise.all(imgs.map((img) => img.decode().catch(() => undefined))).then(go);
+    const fallback = window.setTimeout(go, 2600);
+    return () => window.clearTimeout(fallback);
+  }, []);
+
   return (
-    <section className="hero" id="s1" aria-labelledby="hero-title">
-      <div className="hero-media">
-        <Photo
-          name="hero"
-          priority
-          alt="Modern home at dusk with warm window light and a dark tree line, MORAINEX concept"
-          className="hero-poster"
-        />
-        <HeroScene />
+    <section
+      className={`hero${on ? " is-on" : ""}${ready ? " is-ready" : ""}`}
+      aria-labelledby="hero-title"
+    >
+      <div className="hero-visual">
+        <div className="stage" ref={stage}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            className="stage-base"
+            {...houseSrc("off")}
+            sizes={sizes}
+            alt="A modern two-story house at dusk with linear LED soffit lights, recessed lights, and wall-wash uplights, MORAINEX concept"
+            width={2048}
+            height={1152}
+            fetchPriority="high"
+          />
+          {LIGHT_ZONES.map((zone, i) => (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              key={zone}
+              className="stage-light"
+              style={{ ["--i" as string]: i }}
+              {...houseSrc(zone)}
+              sizes={sizes}
+              alt=""
+              aria-hidden="true"
+              width={2048}
+              height={1152}
+              decoding="async"
+            />
+          ))}
+          <ul className="callouts" aria-hidden="true">
+            {callouts.map((c, i) => (
+              <li
+                key={c.label}
+                className={`callout callout-${c.side}`}
+                style={{ left: `${c.x * 100}%`, top: `${c.y * 100}%`, ["--i" as string]: i }}
+              >
+                <span className="callout-dot" />
+                <span className="callout-text">
+                  <b>{c.label}</b>
+                  <span>{c.spec}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
         <div className="hero-scrim" />
       </div>
-      <div className="hero-card">
-        <p className="eyebrow">Concept project · Colorado electrician, Denver metro</p>
-        <h1 id="hero-title">Panels, EV chargers, and repairs for Denver-metro homes.</h1>
+
+      <div className="hero-copy wrap">
+        <p className="eyebrow">
+          <span className="live-dot" aria-hidden="true" /> Licensed electricians · Denver metro
+        </p>
+        <h1 id="hero-title">
+          Wiring you&apos;ll never <span className="glow">think about</span> again.
+        </h1>
         <p className="lede">
-          Electrical repairs, upgrades, and installs for homes and businesses, with a written price before work starts.
+          Panels, EV chargers, lighting, and repairs for Front Range homes. A price range before we come out, a written
+          quote before we start, and a permit closed when we leave.
         </p>
         <div className="hero-actions">
-          <a className="btn btn-light btn-block" href={PHONE_TEL}>
+          <Link className="btn btn-amber btn-lg" href="/estimate/">
+            Price my project
+            <Arrow />
+          </Link>
+          <a className="btn btn-glass btn-lg" href={PHONE_TEL}>
             Call {PHONE_DISPLAY}
           </a>
-          <a className="btn btn-ghost btn-block" href="#s2">
-            Find a service
-          </a>
-          <Link className="text-link" href="/estimate">
-            Get an estimate
-          </Link>
         </div>
-        <ul className="trust">
-          <li>Sample license # (not real)</li>
-          <li>Insured</li>
-          <li>Same-week slots (example)</li>
+        <button
+          type="button"
+          className="breaker"
+          aria-pressed={on}
+          onClick={() => setOn((v) => !v)}
+        >
+          <span className="breaker-track" aria-hidden="true">
+            <span className="breaker-handle" />
+          </span>
+          <span className="breaker-label">
+            Lights <b>{on ? "on" : "off"}</b>
+          </span>
+        </button>
+      </div>
+
+      <div className="hero-foot">
+        <ul className="wrap trust">
+          <li>
+            <b>2-year</b> workmanship warranty
+          </li>
+          <li>
+            <b>Permits</b> pulled and closed
+          </li>
+          <li>
+            <b>Arrival windows</b>, not all-day waits
+          </li>
+          <li>
+            <b>Written quote</b> before work starts
+          </li>
         </ul>
       </div>
     </section>
