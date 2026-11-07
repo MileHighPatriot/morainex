@@ -93,9 +93,9 @@ export function EmergencyTiers() {
     <div className="tiers">
       <div className="tier tier-hot">
         <p className="tier-key">Get out first</p>
-        <h3>
+        <h2 className="h3">
           Leave the house, then <Dial911 /> from outside.
-        </h3>
+        </h2>
         <ul className="ticks">
           {getOut.map((item) => (
             <li key={item}>{item}</li>
@@ -104,7 +104,7 @@ export function EmergencyTiers() {
       </div>
       <div className="tier">
         <p className="tier-key">Call us today</p>
-        <h3>Not an emergency, but don&apos;t sit on it.</h3>
+        <h2 className="h3">Not an emergency, but don&apos;t sit on it.</h2>
         <ul className="ticks">
           {callToday.map((item) => (
             <li key={item}>{item}</li>

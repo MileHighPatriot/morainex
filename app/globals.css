@@ -53,6 +53,8 @@ h1, h2, h3 {
 h1 { font-size: clamp(2.6rem, 6.2vw, 5.4rem); letter-spacing: -0.034em; line-height: 1; }
 h2 { font-size: clamp(2.1rem, 4.6vw, 3.9rem); }
 h3 { font-size: 1.22rem; letter-spacing: -0.02em; line-height: 1.2; }
+/* An h2 that looks like an h3, where the heading order needs an h2 (book steps, emergency tiers). */
+h2.h3 { font-size: 1.22rem; letter-spacing: -0.02em; line-height: 1.2; }
 p { margin: 0 0 12px; }
 a { color: inherit; }
 button, input, select, textarea { font: inherit; color: inherit; }
@@ -519,7 +521,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   font-family: var(--mono); font-size: 14px;
   box-shadow: 0 0 0 6px var(--paper);
 }
-.steps h3 { margin-bottom: 8px; }
+.steps h3, .steps .h3 { margin-bottom: 8px; }
 .steps p { color: var(--paper-muted); font-size: 15.5px; }
 
 /* ---------- reviews ---------- */
@@ -756,7 +758,7 @@ legend { font-weight: 600; font-size: 14.5px; margin-bottom: 10px; padding: 0; }
 .tier-hot { background: linear-gradient(160deg, rgba(255, 107, 74, 0.14), rgba(255, 107, 74, 0.03)), var(--panel); border-color: rgba(255, 107, 74, 0.35); }
 .tier-key { font-family: var(--mono); font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--amber); margin-bottom: 10px; }
 .tier-hot .tier-key { color: #ff9b84; }
-.tier h3 { font-size: 1.45rem; margin-bottom: 18px; }
+.tier h3, .tier .h3 { font-size: 1.45rem; margin-bottom: 18px; }
 .tier-hot .ticks li::before { background: rgba(255, 107, 74, 0.18); }
 .tier-hot .ticks li::after { border-color: #ff9b84; }
 .downed { margin: 16px 0 0; padding: 22px 24px; border-radius: var(--r); background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--danger); color: rgba(238, 236, 230, 0.86); }

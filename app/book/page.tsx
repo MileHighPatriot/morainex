@@ -32,7 +32,7 @@ export default function BookPage() {
                 <li key={step.name}>
                   <span className="step-node">{String(i + 1).padStart(2, "0")}</span>
                   <div>
-                    <h3>{step.name}</h3>
+                    <h2 className="h3">{step.name}</h2>
                     <p>{step.body}</p>
                   </div>
                 </li>
