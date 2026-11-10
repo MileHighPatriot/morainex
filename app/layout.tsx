@@ -78,6 +78,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
       <body>
         <Reveal />
+        <div className="charge" aria-hidden="true" />
         <a className="skip" href="#main">
           Skip to content
         </a>

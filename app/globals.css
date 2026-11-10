@@ -852,6 +852,100 @@ legend { font-weight: 600; font-size: 14.5px; margin-bottom: 10px; padding: 0; }
   .callbar.is-hidden { transform: translateY(110%); }
 }
 
+/* =====================================================================
+   Upgrade pass: more "live current". Resting styles are the finished
+   picture; motion sits behind .can-motion like the rest of the site, and
+   scroll-linked motion only runs where animation-timeline is supported.
+   ===================================================================== */
+.charge { display: none; }
+.spark { display: none; }
+
+/* The lit word in a heading strikes like a tube when its section arrives. */
+@keyframes tube-on {
+  0% { color: #8d8674; text-shadow: none; }
+  8% { color: var(--amber-hi); text-shadow: 0 0 28px rgba(243, 180, 74, 0.45); }
+  14% { color: #8d8674; text-shadow: none; }
+  22% { color: var(--amber-hi); text-shadow: 0 0 18px rgba(243, 180, 74, 0.3); }
+  30% { color: #a89f88; text-shadow: none; }
+  44%, 100% { color: var(--amber-hi); text-shadow: 0 0 28px rgba(243, 180, 74, 0.45); }
+}
+.can-motion [data-reveal].is-in .glow { animation: tube-on 1.3s 0.35s both; }
+/* In the hero the word follows the house: dark with the lights off, struck when they come on. */
+.hero .glow { transition: color 0.4s, text-shadow 0.4s; }
+.hero:not(.is-on) .glow { color: #b5ad98; text-shadow: none; }
+.can-motion .hero.is-on .glow { animation: tube-on 1.5s 0.5s both; }
+
+/* Breakers on the service board click on, one after another, as the board arrives. */
+@keyframes flip-track { to { background: rgba(243, 180, 74, 0.45); } }
+@keyframes flip-handle { to { transform: translateX(16px); background: var(--amber); box-shadow: 0 0 10px var(--amber); } }
+.can-motion .breaker-card.is-in .flip { animation: flip-track 0.35s calc(var(--d, 0ms) + 0.7s) both; }
+.can-motion .breaker-card.is-in .flip span { animation: flip-handle 0.35s var(--ease) calc(var(--d, 0ms) + 0.7s) both; }
+
+/* A spark runs the wire between the four steps once the wire has drawn. */
+@keyframes spark-run {
+  0% { left: 0; opacity: 0; }
+  6% { opacity: 1; }
+  94% { opacity: 1; }
+  100% { left: calc(400% + 84px); opacity: 0; }
+}
+.can-motion .steps.is-in .spark {
+  display: block; position: absolute; z-index: 0; top: 19px; left: 0;
+  width: 26px; height: 10px; margin-left: -13px; border-radius: 999px;
+  background: radial-gradient(closest-side, #fff, var(--amber-hi) 45%, transparent);
+  filter: drop-shadow(0 0 8px var(--amber));
+  animation: spark-run 3.2s linear 2s infinite;
+}
+@media (max-width: 900px) { .can-motion .steps.is-in .spark { display: none; } }
+
+/* Power moving out from Denver along each line on the map. */
+@keyframes spoke-flow { to { stroke-dashoffset: -32; } }
+.can-motion .map .spoke:not(.is-hit) { stroke: rgba(255, 211, 132, 0.34); stroke-dasharray: 5 11; animation: spoke-flow 1.6s linear infinite; }
+@keyframes ring-ping { 0% { opacity: 0.9; } 100% { opacity: 0.25; } }
+.can-motion .map .ring { animation: ring-ping 2.4s ease-in-out infinite alternate; }
+.can-motion .map .ring:nth-of-type(3) { animation-delay: 0.5s; }
+.can-motion .map .ring:nth-of-type(4) { animation-delay: 1s; }
+
+/* Spec numbers come on in turn. */
+.can-motion .spec-row.is-in b { animation: tube-on 1.2s both; }
+.can-motion .spec-row.is-in li:nth-child(2) b { animation-delay: 0.25s; }
+.can-motion .spec-row.is-in li:nth-child(3) b { animation-delay: 0.5s; }
+.spec-row b { color: var(--amber-hi); }
+
+@keyframes charge-fill { from { transform: scaleX(0); } to { transform: none; } }
+@keyframes hero-push { to { transform: scale(1.09) translateY(2%); } }
+@keyframes hero-lift { to { transform: translateY(-56px); opacity: 0; } }
+@keyframes lights-up { from { filter: brightness(0.38) saturate(0.6); } to { filter: none; } }
+
+@supports (animation-timeline: view()) {
+  /* An amber line across the top that charges as you move down the page. */
+  .can-motion .charge {
+    display: block; position: fixed; inset: 0 0 auto 0; z-index: 90; height: 2px;
+    background: linear-gradient(90deg, var(--amber-lo), var(--amber-hi));
+    box-shadow: 0 0 12px var(--amber);
+    transform-origin: left;
+    animation: charge-fill linear both;
+    animation-timeline: scroll(root);
+  }
+  @media (min-width: 761px) {
+    .can-motion .hero-visual {
+      animation: hero-push linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 100vh;
+    }
+    .can-motion .hero-copy {
+      animation: hero-lift linear both;
+      animation-timeline: scroll(root);
+      animation-range: 35vh 95vh;
+    }
+  }
+  /* The last photo starts dim and the lights come up as you reach it. */
+  .can-motion .final-media img {
+    animation: lights-up linear both;
+    animation-timeline: view();
+    animation-range: entry 10% cover 48%;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }

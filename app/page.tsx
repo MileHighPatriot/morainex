@@ -143,6 +143,7 @@ export default function HomePage() {
           <ol className="steps" data-reveal>
             {steps.map((step, i) => (
               <li key={step.name} style={{ ["--d" as string]: `${i * 140}ms` }}>
+                {i === 0 ? <span className="spark" aria-hidden="true" /> : null}
                 <span className="step-node">{String(i + 1).padStart(2, "0")}</span>
                 <h3>{step.name}</h3>
                 <p>{step.body}</p>
